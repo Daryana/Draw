@@ -58,17 +58,17 @@ const
 var
     i: integer;
     b: TBitBtn;
-    bmap: TBitMap;
+    bpng: TPortableNetworkGraphic;
 begin
   for i := High(consttool.tool) downto 0 do
   begin
-    bmap := TBitmap.Create;
-    bmap.LoadFromFile('icons/' +consttool.tool[i].ClassName + '.bmp');
+    bpng := TPortableNetworkGraphic.Create;
+    bpng.LoadFromFile('icons/' +consttool.tool[i].ClassName + '.png');
     b := TBitBtn.Create(PanelTools);
     b.Parent:= PanelTools;
     b.Width := a;
     b.Height := a;
-    b.Glyph := bmap;
+    b.Glyph.Assign(bpng);
     //b.Top := c;
     //b.left := (i + 1)*a + c*(i + 1);
     b.Align := alLeft;

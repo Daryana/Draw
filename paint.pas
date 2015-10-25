@@ -5,12 +5,16 @@ unit paint;
 interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  Buttons, Menus, StdCtrls, CheckLst, ColorBox, typinfo, ctool, DrawScene;
+  Buttons, Menus, StdCtrls, CheckLst, ColorBox, typinfo, ctool, DrawScene, WorldPole;
 type
 
   { TMyForm }
 
   TMyForm = class(TForm)
+    ColorBox: TColorBox;
+    PaintPanel: TPanel;
+    HorizontalSB: TScrollBar;
+    VerticalSB: TScrollBar;
     TToolClear: TBitBtn;
     MainMenu: TMainMenu;
     MenuItemFile: TMenuItem;
@@ -20,14 +24,15 @@ type
     PaintBox: TPaintBox;
     PanelTools: TPanel;
     Panel: TPanel;
+    procedure ColorBoxSelect(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure MenuItemAutorClick(Sender: TObject);
     procedure PaintBoxMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+      Shift: TShiftState; X, Y: integer);
     procedure PaintBoxMouseMove(Sender: TObject; Shift: TShiftState; X,
-      Y: Integer);
+      Y: integer);
     procedure PaintBoxMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+      Shift: TShiftState; X, Y: integer);
     procedure PaintBoxPaint(Sender: TObject);
     procedure ButtonToolClick(Sender: TObject);
     procedure TToolClearClick(Sender: TObject);
@@ -40,6 +45,8 @@ type
 
 var
   MyForm: TMyForm;
+  k : boolean;
+  xx, yy: integer;
 implementation
 
 {$R *.lfm}
@@ -75,17 +82,21 @@ begin
     b.tag := i;
     b.OnClick:=@ButtonToolClick;
   end;
+  PoleZoom := 1;
 end;
 
-
+procedure TMyForm.ColorBoxSelect(Sender: TObject);
+begin
+  ColorLine := ColorBox.Selected;
+end;
 
 procedure TMyForm.PaintBoxMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+  Shift: TShiftState; X, Y: integer);
 begin
-  If Button = mbLeft  then
+  If Button = mbLeft then
   begin
     DownMouseFlag := True;
-    consttool.tool[ToolKod].MouseDown(point(x,y));
+    consttool.tool[ToolKod].MouseDown(x, y);
     paintbox.Invalidate;
   end
   else
@@ -93,15 +104,15 @@ begin
 end;
 
 procedure TMyForm.PaintBoxMouseMove(Sender: TObject; Shift: TShiftState; X,
-  Y: Integer);
+  Y: integer);
 begin
   if DownMouseFlag then
-     consttool.tool[ToolKod].MouseMove(point(x,y));
+      consttool.tool[ToolKod].MouseMove(x, y);
   paintbox.Invalidate;
 end;
 
 procedure TMyForm.PaintBoxMouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+  Shift: TShiftState; X, Y: integer);
 begin
   DownMouseFlag:= false;
 end;

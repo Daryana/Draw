@@ -5,38 +5,38 @@ unit Tool;
 interface
 
 uses
-  Classes, SysUtils, Figure, Graphics, crt, CTool, DrawScene;
+  Classes, SysUtils, Figure, Graphics, crt, CTool, DrawScene, WorldPole;
 type
   { TToolPen }
 
   TToolPen = class (TTool)
   public
-    procedure MouseDown(po:TPoint);  override;
-    procedure MouseMove(po:TPoint);  override;
+    procedure MouseDown(x, y: integer);  override;
+    procedure MouseMove(x, y: integer);  override;
   end;
 
   { TToolRectangle }
 
   TToolRectangle = class (TTool)
   public
-     procedure MouseDown(po:TPoint);  override;
-     procedure MouseMove(po:TPoint);  override;
+     procedure MouseDown(x, y: integer);  override;
+     procedure MouseMove(x, y: integer);  override;
    end;
 
   { TToolEllipse }
 
   TToolEllipse = class (TTool)
    public
-     procedure MouseDown(po:TPoint);  override;
-     procedure MouseMove(po:TPoint);  override;
+     procedure MouseDown(x, y: integer);  override;
+     procedure MouseMove(x, y: integer);  override;
   end;
 
    { TToolLine }
 
    TToolLine = class (TTool)
    public
-     procedure MouseDown(po:TPoint);  override;
-     procedure MouseMove(po:TPoint);  override;
+     procedure MouseDown(x, y: integer);  override;
+     procedure MouseMove(x, y: integer);  override;
    end;
 
 
@@ -44,107 +44,183 @@ type
 
   TToolRoundRectangle = class (TTool)
   public
-    procedure MouseDown(po:TPoint);  override;
-    procedure MouseMove(po:TPoint);  override;
+    procedure MouseDown(x, y: integer);  override;
+    procedure MouseMove(x, y: integer);  override;
   end;
 
   { TToolPolyLine }
 
   TToolPolyLine  = class (TTool)
   public
-    procedure MouseDown(po:TPoint);  override;
-    procedure MouseMove(po:TPoint);  override;
+    procedure MouseDown(x, y: integer);  override;
+    procedure MouseMove(x, y: integer);  override;
+  end;
+
+  { TToolHand }
+
+  TToolHand = class (TTool)
+  private
+    tx, ty: Extended;
+  public
+    procedure MouseDown(x, y: integer);  override;
+    procedure MouseMove(x, y: integer);  override;
+  end;
+
+  { TToolLoupePlus }
+
+  TToolLoupePlus = class (TTool)
+  private
+    const
+      a = 2;
+  public
+    procedure MouseDown(x, y: integer);  override;
+    procedure MouseMove(x, y: integer);  override;
+  end;
+
+{ TToolLoupeMinus }
+
+TToolLoupeMinus = class (TTool)
+  private
+    const
+      a = 2;
+  public
+    procedure MouseDown(x, y: integer);  override;
+    procedure MouseMove(x, y: integer);  override;
   end;
 
 implementation
 
+{ TToolLoupeMinus }
+
+procedure TToolLoupeMinus.MouseDown(x, y: integer);
+begin
+  PoleZoom := PoleZoom / a;
+end;
+
+procedure TToolLoupeMinus.MouseMove(x, y: integer);
+begin
+end;
+
+{ TToolLoupePlus }
+
+procedure TToolLoupePlus.MouseDown(x, y: integer);
+begin
+  PoleZoom := PoleZoom * a;
+end;
+
+procedure TToolLoupePlus.MouseMove(x, y: integer);
+begin
+end;
+
+{ TToolHand }
+
+procedure TToolHand.MouseDown(x, y: integer);
+begin
+  tx := x;
+  ty := y;
+end;
+
+procedure TToolHand.MouseMove(x, y: integer);
+begin
+  PoleShift.X += trunc(x - tx);
+  PoleShift.Y += trunc(y - ty);
+  tx := x;
+  ty := y;
+end;
+
 { TToolPolyLine }
 
-procedure TToolPolyLine.MouseDown(po: TPoint);
+procedure TToolPolyLine.MouseDown(x, y: integer);
 begin
   if not PLineFlag then
     begin
       SetLength(figures, Length(figures)+1);
-      figures[High(figures)] := TPolyLine.Create(Po);
+      figures[High(figures)] := TPolyLine.Create(x, y);
+      figures[High(figures)].ColorFigure := ColorLine;
       PLineFlag := true;
     end
     else
     begin
-      tpolyline(figures[High(figures)]).FreeLine(Po);
+      tpolyline(figures[High(figures)]).FreeLine(x, y);
     end;
 end;
 
-procedure TToolPolyLine.MouseMove(po: TPoint);
+procedure TToolPolyLine.MouseMove(x, y: integer);
 begin
-  figures[High(figures)].Finish(po);
+  figures[High(figures)].Finish(x, y);
 end;
 
 { TToolRoundRectangle }
 
-procedure TToolRoundRectangle.MouseDown(po: TPoint);
+procedure TToolRoundRectangle.MouseDown(x, y: integer);
 begin
   SetLength(figures, Length(figures)+1);
-  figures[High(figures)] := TRoundRectangle.Create(po);
+  figures[High(figures)] := TRoundRectangle.Create(x, y);
+  figures[High(figures)].ColorFigure := ColorLine;
 end;
 
-procedure TToolRoundRectangle.MouseMove(po: TPoint);
+procedure TToolRoundRectangle.MouseMove(x, y: integer);
 begin
-  figures[High(figures)].Finish(po);
+  figures[High(figures)].Finish(x, y);
 end;
 
 { TToolLine }
 
-procedure TToolLine.MouseDown(po: TPoint);
+procedure TToolLine.MouseDown(x, y: integer);
 begin
   SetLength(figures, Length(figures)+1);
-  figures[High(figures)] := TLine.Create(po);
+  figures[High(figures)] := TLine.Create(x, y);
+  figures[High(figures)].ColorFigure := ColorLine;
 end;
 
-procedure TToolLine.MouseMove(po: TPoint);
+procedure TToolLine.MouseMove(x, y: integer);
 begin
-  figures[High(figures)].Finish(po);
+  figures[High(figures)].Finish(x, y);
 end;
 
 { TToolEllipse }
 
 
-procedure TToolEllipse.MouseDown(po: TPoint);
+procedure TToolEllipse.MouseDown(x, y: integer);
 begin
   SetLength(figures, Length(figures)+1);
-  figures[High(figures)] := TEllipse.Create(po);
+  figures[High(figures)] := TEllipse.Create(x, y);
+  figures[High(figures)].ColorFigure := ColorLine;
 end;
 
-procedure TToolEllipse.MouseMove(po: TPoint);
+procedure TToolEllipse.MouseMove(x, y: integer);
 begin
-  figures[High(figures)].Finish(po);
+  figures[High(figures)].Finish(x, y);
 end;
 
 { TToolRectangle }
 
 
-procedure TToolRectangle.MouseDown(po: TPoint);
+procedure TToolRectangle.MouseDown(x, y: integer);
 begin
   SetLength(figures, Length(figures)+1);
-  figures[High(figures)] := TRectangle.Create(po);
+  figures[High(figures)] := TRectangle.Create(x, y);
+  figures[High(figures)].ColorFigure := ColorLine;
 end;
 
-procedure TToolRectangle.MouseMove(po: TPoint);
+procedure TToolRectangle.MouseMove(x, y: integer);
 begin
-  figures[High(figures)].Finish(po);
+  figures[High(figures)].Finish(x, y);
 end;
 
 { TToolPen }
 
 
-procedure TToolPen.MouseDown(po: TPoint);
+procedure TToolPen.MouseDown(x, y: integer);
 begin
   SetLength(figures, Length(figures)+1);
-  figures[High(figures)] := TPolyLine.Create(po);
+  figures[High(figures)] := TPolyLine.Create(x, y);
+  figures[High(figures)].ColorFigure := ColorLine;
 end;
 
-procedure TToolPen.MouseMove(po: TPoint);
+procedure TToolPen.MouseMove(x, y: integer);
 begin
-  TPolyLine(figures[High(figures)]).FreeLine(po);
+  TPolyLine(figures[High(figures)]).FreeLine(x, y);
 end;
 
 initialization
@@ -155,6 +231,9 @@ initialization
  ConstTool.ToolRegister(TToolEllipse);
  ConstTool.ToolRegister(TToolRectangle);
  ConstTool.ToolRegister(TToolRoundRectangle);
+ ConstTool.ToolRegister(TToolHand);
+ ConstTool.ToolRegister(TToolLoupePlus);
+ ConstTool.ToolRegister(TToolLoupeMinus);
 finalization
  ConstTool.free;
 

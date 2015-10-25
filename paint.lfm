@@ -1,11 +1,11 @@
 object MyForm: TMyForm
-  Left = 171
+  Left = 131
   Height = 468
-  Top = 153
-  Width = 720
+  Top = 91
+  Width = 725
   Caption = 'Редактор'
   ClientHeight = 448
-  ClientWidth = 720
+  ClientWidth = 725
   Color = clWindow
   Menu = MainMenu
   OnCreate = FormCreate
@@ -14,11 +14,11 @@ object MyForm: TMyForm
     Left = 0
     Height = 35
     Top = 0
-    Width = 720
+    Width = 725
     Align = alTop
     Caption = ' '
     ClientHeight = 35
-    ClientWidth = 720
+    ClientWidth = 725
     TabOrder = 0
     object TToolClear: TBitBtn
       Left = 1
@@ -169,18 +169,61 @@ object MyForm: TMyForm
     Width = 162
     Align = alLeft
     Caption = ' '
+    ClientHeight = 413
+    ClientWidth = 162
     TabOrder = 1
+    object ColorBox: TColorBox
+      Left = 8
+      Height = 22
+      Top = 24
+      Width = 148
+      ItemHeight = 16
+      OnSelect = ColorBoxSelect
+      TabOrder = 0
+    end
   end
-  object PaintBox: TPaintBox
+  object PaintPanel: TPanel
     Left = 162
     Height = 413
     Top = 35
-    Width = 558
+    Width = 563
     Align = alClient
-    OnMouseDown = PaintBoxMouseDown
-    OnMouseMove = PaintBoxMouseMove
-    OnMouseUp = PaintBoxMouseUp
-    OnPaint = PaintBoxPaint
+    Caption = ' '
+    ClientHeight = 413
+    ClientWidth = 563
+    TabOrder = 2
+    object PaintBox: TPaintBox
+      Left = 1
+      Height = 394
+      Top = 1
+      Width = 544
+      Align = alClient
+      OnMouseDown = PaintBoxMouseDown
+      OnMouseMove = PaintBoxMouseMove
+      OnMouseUp = PaintBoxMouseUp
+      OnPaint = PaintBoxPaint
+    end
+    object HorizontalSB: TScrollBar
+      Left = 1
+      Height = 17
+      Top = 395
+      Width = 561
+      Align = alBottom
+      Enabled = False
+      PageSize = 0
+      TabOrder = 0
+    end
+    object VerticalSB: TScrollBar
+      Left = 545
+      Height = 394
+      Top = 1
+      Width = 17
+      Align = alRight
+      Enabled = False
+      Kind = sbVertical
+      PageSize = 0
+      TabOrder = 1
+    end
   end
   object MainMenu: TMainMenu
     left = 496

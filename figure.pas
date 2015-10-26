@@ -5,36 +5,41 @@ unit Figure;
 interface
 
 uses
-  Classes, SysUtils, Graphics, crt, Graph, WorldPole;
+  Classes, SysUtils, Graphics, crt, Graph, WorldPole, UTypes;
 
 type
+
+   { TFigure }
+
    TFigure = class
    public
      ColorFigure: TColor;
+     WidthFigure: Integer;
+     StyleFigure: TPenStyle;
      procedure Draw(canvas: TCanvas); virtual; Abstract;
-     procedure Finish(x, y: integer); virtual; Abstract;
+     procedure Finish(po: TPoint); virtual; Abstract;
    end;
 
    { TRectangle }
 
    TRectangle = class(TFigure)
    private
-     r: array[1..4] of extended;
+     r: TFloatRect;
    public
-     constructor Create(x, y: integer);
+     constructor Create(po: TPoint);
      procedure Draw(canvas: TCanvas); override;
-     procedure Finish(x, y: integer); override;
+     procedure Finish(po: TPoint); override;
    end;
 
    { TEllipse }
 
    TEllipse = class(TFigure)
    private
-     r: array[1..4] of extended;
+     r: TFloatRect;
    public
-     constructor Create(x, y: integer);
+     constructor Create(po: TPoint);
      procedure Draw(canvas: TCanvas); override;
-     procedure Finish(x, y: integer); override;
+     procedure Finish(po: TPoint); override;
    end;
 
 
@@ -42,157 +47,133 @@ type
 
    TLine = class(TFigure)
    private
-     r: array[1..4] of extended;
+     r: TFloatRect;
    public
-     constructor Create(x, y: integer);
+     constructor Create(po: TPoint);
      procedure Draw(canvas: TCanvas); override;
-     procedure Finish(x, y: integer); override;
+     procedure Finish(po: TPoint); override;
    end;
 
    { TRoundRectangle }
 
    TRoundRectangle = class(TFigure)
    private
-     r: array[1..4] of extended;
-   const
-     ConstRound = 15;
+     r: TFloatRect;
    public
-     constructor Create(x, y: integer);
+     ConstRound: integer;
+     constructor Create(po: TPoint);
      procedure Draw(canvas: TCanvas); override;
-     procedure Finish(x, y: integer); override;
+     procedure Finish(po: TPoint); override;
    end;
 
    { TPolyLine }
 
    TPolyLine = class(TFigure)
    private
-     p: array of Extended;
+     p: array of TFloatPoint;
    public
-     constructor Create(x, y: integer);
+     constructor Create(po: TPoint);
      procedure Draw(canvas: TCanvas); override;
-     procedure Finish(x, y: integer); override;
-     procedure FreeLine(x, y: integer);
+     procedure Finish(po: TPoint); override;
+     procedure FreeLine(po: TPoint);
    end;
 implementation
 
 { TRectangle }
 
-constructor TRectangle.Create(x, y: integer);
+constructor TRectangle.Create(po: TPoint);
 begin
-  r[1] := Pole.World(x, PoleShift.x, PoleZoom);
-  r[2] := Pole.World(y, PoleShift.y, PoleZoom);
-  r[3] := Pole.World(x, PoleShift.x, PoleZoom);
-  r[4] := Pole.World(y, PoleShift.y, PoleZoom);
+  r  := ToFloatRect(Pole.LocalToWorld(po), Pole.LocalToWorld(po));
 end;
 
 procedure TRectangle.Draw(canvas: TCanvas);
 begin
-  canvas.Rectangle(Pole.Local(r[1], r[2], PoleShift, PoleZoom).x, Pole.Local(r[1], r[2], PoleShift, PoleZoom).y, Pole.Local(r[3], r[4], PoleShift, PoleZoom).x, Pole.Local(r[3], r[4], PoleShift, PoleZoom).y);
+  canvas.Rectangle(ToRect(Pole.WorldToLocal(r.Top), Pole.WorldToLocal(r.Bottom)));
 end;
 
-procedure TRectangle.Finish(x, y: integer);
+procedure TRectangle.Finish(po: TPoint);
 begin
-  r[3] := Pole.World(x, PoleShift.x, PoleZoom);
-  r[4] := Pole.World(y, PoleShift.y, PoleZoom);
+  r.Bottom := Pole.LocalToWorld(po);
 end;
 
 { TEllipse }
 
-constructor TEllipse.Create(x, y: integer);
+constructor TEllipse.Create(po: TPoint);
 begin
-  r[1] := Pole.World(x, PoleShift.x, PoleZoom);
-  r[2] := Pole.World(y, PoleShift.y, PoleZoom);
-  r[3] := Pole.World(x, PoleShift.x, PoleZoom);
-  r[4] := Pole.World(y, PoleShift.y, PoleZoom);
+  r  := ToFloatRect(Pole.LocalToWorld(po), Pole.LocalToWorld(po));
 end;
 
 procedure TEllipse.Draw(canvas: TCanvas);
 begin
-  canvas.Ellipse(Pole.Local(r[1], r[2], PoleShift, PoleZoom).x, Pole.Local(r[1], r[2], PoleShift, PoleZoom).y, Pole.Local(r[3], r[4], PoleShift, PoleZoom).x, Pole.Local(r[3], r[4], PoleShift, PoleZoom).y);
+  canvas.Ellipse(ToRect(Pole.WorldToLocal(r.Top), Pole.WorldToLocal(r.Bottom)));
 end;
 
-procedure TEllipse.Finish(x, y: integer);
+procedure TEllipse.Finish(po: TPoint);
 begin
-  r[3] := Pole.World(x, PoleShift.x, PoleZoom);
-  r[4] := Pole.World(y, PoleShift.y, PoleZoom);
+  r.Bottom := Pole.LocalToWorld(po);
 end;
 
 
 { TLine }
 
-constructor TLine.Create(x, y: integer);
+constructor TLine.Create(po: TPoint);
 begin
-  r[1] := Pole.World(x, PoleShift.x, PoleZoom);
-  r[2] := Pole.World(y, PoleShift.y, PoleZoom);
-  r[3] := Pole.World(x, PoleShift.x, PoleZoom);
-  r[4] := Pole.World(y, PoleShift.y, PoleZoom);
+  r  := ToFloatRect(Pole.LocalToWorld(po), Pole.LocalToWorld(po));
 end;
 
 procedure TLine.Draw(canvas: TCanvas);
 begin
-  canvas.Line(Pole.Local(r[1], r[2], PoleShift, PoleZoom), Pole.Local(r[3], r[4], PoleShift, PoleZoom));
+  canvas.Line(Pole.WorldToLocal(r.Top), Pole.WorldToLocal(r.Bottom));
 end;
 
-procedure TLine.Finish(x, y: integer);
+procedure TLine.Finish(po: TPoint);
 begin
-  r[3] := Pole.World(x, PoleShift.x, PoleZoom);
-  r[4] := Pole.World(y, PoleShift.y, PoleZoom);
+  r.Bottom := Pole.LocalToWorld(po);
 end;
 
 { TRoundRectangle }
 
-constructor TRoundRectangle.Create(x, y: integer);
+constructor TRoundRectangle.Create(po: TPoint);
 begin
-  r[1] := Pole.World(x, PoleShift.x, PoleZoom);
-  r[2] := Pole.World(y, PoleShift.y, PoleZoom);
-  r[3] := Pole.World(x, PoleShift.x, PoleZoom);
-  r[4] := Pole.World(y, PoleShift.y, PoleZoom);
+  r  := ToFloatRect(Pole.LocalToWorld(po), Pole.LocalToWorld(po));
 end;
 
 procedure TRoundRectangle.Draw(canvas: TCanvas);
 begin
-  canvas.RoundRect(Pole.Local(r[1], r[2], PoleShift, PoleZoom).x, Pole.Local(r[1], r[2], PoleShift, PoleZoom).y, Pole.Local(r[3], r[4], PoleShift, PoleZoom).x, Pole.Local(r[3], r[4], PoleShift, PoleZoom).y, ConstRound, ConstRound);
+  canvas.RoundRect(ToRect(Pole.WorldToLocal(r.Top), Pole.WorldToLocal(r.Bottom)), ConstRound, ConstRound);
 end;
 
-procedure TRoundRectangle.Finish(x, y: integer);
+procedure TRoundRectangle.Finish(po: TPoint);
 begin
-  r[3] := Pole.World(x, PoleShift.x, PoleZoom);
-  r[4] := Pole.World(y, PoleShift.y, PoleZoom);
+  r.Bottom := Pole.LocalToWorld(po);
 end;
 
 { TPolyLine }
 
-constructor TPolyLine.Create(x, y: integer);
+constructor TPolyLine.Create(po: TPoint);
 begin
-  SetLength(p, 4);
-  p[0] := Pole.World(x, PoleShift.x, PoleZoom);
-  p[1] := Pole.World(y, PoleShift.y, PoleZoom);
-  p[2] := Pole.World(x, PoleShift.x, PoleZoom);
-  p[3] := Pole.World(y, PoleShift.y, PoleZoom);
+  SetLength(p, 2);
+  p[0] := Pole.LocalToWorld(po);
+  p[1] := Pole.LocalToWorld(po);
 end;
 
 procedure TPolyLine.Draw(canvas: TCanvas);
 var
   i: integer;
 begin
-  for i := 0 to High(p) - 3 do
-    if (i mod 2 = 0) then
-    begin
-      canvas.Line(Pole.Local(p[i], p[i + 1], PoleShift, PoleZoom), Pole.Local(p[i + 2], p[i + 3], PoleShift, PoleZoom));
-    end;
+  for i := 0 to High(p) - 1 do
+    canvas.Line(Pole.WorldToLocal(p[i]), Pole.WorldToLocal(p[i + 1]));
 end;
 
-procedure TPolyLine.Finish(x, y: integer);
+procedure TPolyLine.Finish(po: TPoint);
 begin
-  p[High(p) - 1] := Pole.World(x, PoleShift.x, PoleZoom);
-  p[High(p)] := Pole.World(y, PoleShift.y, PoleZoom);
+  p[High(p)] := Pole.LocalToWorld(po);
 end;
 
-procedure TPolyLine.FreeLine(x, y: integer);
+procedure TPolyLine.FreeLine(po: TPoint);
 begin
-  SetLength(p, Length(p) + 2);
-  p[High(p) - 1] := Pole.World(x, PoleShift.x, PoleZoom);
-  p[High(p)] := Pole.World(y, PoleShift.y, PoleZoom);
+  SetLength(p, Length(p) + 1);
+  p[High(p)] := Pole.LocalToWorld(po);
 end;
 
 end.

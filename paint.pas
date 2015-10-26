@@ -5,15 +5,24 @@ unit paint;
 interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  Buttons, Menus, StdCtrls, CheckLst, ColorBox, typinfo, ctool, DrawScene, WorldPole;
+  Buttons, Menus, StdCtrls, CheckLst, ColorBox, ComCtrls, typinfo, ctool,
+  DrawScene, WorldPole;
 type
 
   { TMyForm }
 
   TMyForm = class(TForm)
+    StyleBox: TComboBox;
+    FillBox: TComboBox;
+    RoundListBox: TEdit;
+    ScaleListBox: TEdit;
+    LoupePlus: TBitBtn;
+    LoupeMinus: TBitBtn;
     ColorBox: TColorBox;
     PaintPanel: TPanel;
     HorizontalSB: TScrollBar;
+    UpDownScale: TUpDown;
+    UpDownRound: TUpDown;
     VerticalSB: TScrollBar;
     TToolClear: TBitBtn;
     MainMenu: TMainMenu;
@@ -26,6 +35,10 @@ type
     Panel: TPanel;
     procedure ColorBoxSelect(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure BoxKeyPress(Sender: TObject; var Key: char);
+    procedure StyleBoxSelect(Sender: TObject);
+    procedure ToolLoupePlusClick(Sender: TObject);
+    procedure ToolLoupeMinusClick(Sender: TObject);
     procedure MenuItemAutorClick(Sender: TObject);
     procedure PaintBoxMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
@@ -36,6 +49,9 @@ type
     procedure PaintBoxPaint(Sender: TObject);
     procedure ButtonToolClick(Sender: TObject);
     procedure TToolClearClick(Sender: TObject);
+    procedure UpDownRoundChanging(Sender: TObject; var AllowChange: Boolean);
+    procedure UpDownScaleChanging(Sender: TObject; var AllowChange: Boolean);
+    Procedure Param;
   private
     DownMouseFlag: boolean;
     ToolKod: integer;
@@ -46,7 +62,6 @@ type
 var
   MyForm: TMyForm;
   k : boolean;
-  xx, yy: integer;
 implementation
 
 {$R *.lfm}
@@ -61,7 +76,6 @@ end;
 procedure TMyForm.FormCreate(Sender: TObject);
 const
   a = 35;
-  //c = 5;
 var
     i: integer;
     b: TBitBtn;
@@ -76,13 +90,36 @@ begin
     b.Width := a;
     b.Height := a;
     b.Glyph.Assign(bpng);
-    //b.Top := c;
-    //b.left := (i + 1)*a + c*(i + 1);
     b.Align := alLeft;
     b.tag := i;
     b.OnClick:=@ButtonToolClick;
   end;
   PoleZoom := 1;
+  MyForm.Param;
+end;
+
+procedure TMyForm.BoxKeyPress(Sender: TObject; var Key: char);
+begin
+  if not (Key in ['0'..'9']) then Key := #0;
+end;
+
+procedure TMyForm.StyleBoxSelect(Sender: TObject);
+begin
+  StyleNumber := StyleBox.ItemIndex;
+end;
+
+procedure TMyForm.ToolLoupePlusClick(Sender: TObject);
+begin
+  Scene.PBLoupe('+');
+  PLineFlag := False;
+  paintbox.Invalidate;
+end;
+
+procedure TMyForm.ToolLoupeMinusClick(Sender: TObject);
+begin
+  Scene.PBLoupe('-');
+  PLineFlag := False;
+  paintbox.Invalidate;
 end;
 
 procedure TMyForm.ColorBoxSelect(Sender: TObject);
@@ -96,7 +133,7 @@ begin
   If Button = mbLeft then
   begin
     DownMouseFlag := True;
-    consttool.tool[ToolKod].MouseDown(x, y);
+    consttool.tool[ToolKod].MouseDown(Point(x, y));
     paintbox.Invalidate;
   end
   else
@@ -107,7 +144,7 @@ procedure TMyForm.PaintBoxMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: integer);
 begin
   if DownMouseFlag then
-      consttool.tool[ToolKod].MouseMove(x, y);
+      consttool.tool[ToolKod].MouseMove(Point(x, y));
   paintbox.Invalidate;
 end;
 
@@ -126,6 +163,7 @@ procedure TMyForm.ButtonToolClick(Sender: TObject);
 begin
   ToolKod := TBitBtn(sender).tag;
   PLineFlag := False;
+  MyForm.Param;
 end;
 
 procedure TMyForm.TToolClearClick(Sender: TObject);
@@ -134,6 +172,28 @@ begin
   PLineFlag := False;
   paintbox.Invalidate;
 end;
+
+procedure TMyForm.UpDownRoundChanging(Sender: TObject; var AllowChange: Boolean
+  );
+begin
+  ConstRectRound := UpDownRound.Position;
+end;
+
+procedure TMyForm.UpDownScaleChanging(Sender: TObject; var AllowChange: Boolean);
+begin
+  WidthLine := UpDownScale.Position;
+end;
+
+procedure TMyForm.Param;
+begin
+  ColorBox.Visible := ToolKod in [0..5];
+  ScaleListBox.Visible := ToolKod in [0..5];
+  StyleBox.Visible := ToolKod in [0..5];
+  FillBox.Visible := ToolKod in [3..5];
+  RoundListBox.Visible := ToolKod = 5;
+end;
+
+
 
 
 end.

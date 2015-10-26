@@ -11,8 +11,8 @@ type
 
   TTool = class
   public
-    procedure MouseDown(x, y: integer);  virtual; Abstract;
-    procedure MouseMove(x, y: integer);  virtual; Abstract;
+    procedure MouseDown(po: TPoint);  virtual; Abstract;
+    procedure MouseMove(po: TPoint);  virtual; Abstract;
   end;
 
   ClassOfTTool = class of TTool;

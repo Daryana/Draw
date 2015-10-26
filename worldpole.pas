@@ -5,15 +5,16 @@ unit WorldPole;
 interface
 
 uses
-  Classes, SysUtils, Controls, Clipbrd, ExtCtrls, Forms;
+  Classes, SysUtils, Controls, Clipbrd, ExtCtrls, UTypes;
 type
 
-  { Pole }
+
+  { TPole }
 
   TPole = class
   public
-    function Local(x, y: extended; k: TPoint; n: extended): TPoint;
-    function World(x: integer; k: integer; n: Extended): Extended;
+    function WorldToLocal(po: TFloatPoint): TPoint;
+    function LocalToWorld(po: TPoint): TFloatPoint;
   end;
 var
   Pole: TPole;
@@ -21,17 +22,15 @@ var
   PoleZoom: extended;
 implementation
 
-{ Pole }
 
-function TPole.Local(x, y: extended; k: TPoint; n: Extended): TPoint;
+function TPole.WorldToLocal(po: TFloatPoint): TPoint;
 begin
-  Result.x := Trunc((x + k.x)*n);
-  Result.y := Trunc((y + k.y)*n);
+  Result := Point(Trunc((po.x + PoleShift.x)*PoleZoom), Trunc((po.y + PoleShift.y)*PoleZoom));
 end;
 
-function  TPole.World(x: integer; k: integer; n: Extended): Extended;
+function TPole.LocalToWorld(po: TPoint): TFloatPoint;
 begin
-  Result := (x - k)/n;
+  Result := ToFloatPoint((po.x - PoleShift.x)/PoleZoom, (po.y - PoleShift.y)/PoleZoom);
 end;
 
 end.

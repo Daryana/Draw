@@ -16,6 +16,8 @@ type
      ColorFigure: TColor;
      WidthFigure: Integer;
      StyleFigure: TPenStyle;
+     FillFigure: TBrushStyle;
+     ColorFill: TColor;
      procedure Draw(canvas: TCanvas); virtual; Abstract;
      procedure Finish(po: TPoint); virtual; Abstract;
    end;

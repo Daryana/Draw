@@ -23,7 +23,9 @@ end;
    ColorLine: TColor;
    StyleLine: array[0..4] of TPenStyle = (psSolid, psDash, psDot, psDashDot, psDashDotDot);
    StyleNumber: integer;
-   //FillLine:
+   FillBrush: array[0..7] of TBrushStyle = (bsClear, bsSolid, bsVertical, bsHorizontal, bsBDiagonal, bsFDiagonal, bsCross, bsDiagCross);
+   FillNumber: integer;
+   ColorBrush: TColor;
    ConstRectRound: Integer;
 implementation
 
@@ -38,6 +40,8 @@ begin
     canvas.Pen.Color := figure.ColorFigure;
     canvas.Pen.Width := Figure.WidthFigure;
     canvas.Pen.Style := Figure.StyleFigure;
+    canvas.Brush.Color := figure.ColorFill;
+    canvas.Brush.Style := Figure.FillFigure;
     figure.Draw(Canvas);
   end;
 end;

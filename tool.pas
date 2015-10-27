@@ -118,6 +118,8 @@ begin
   figures[High(figures)].ColorFigure := ColorLine;
   figures[High(figures)].WidthFigure := WidthLine;
   figures[High(figures)].StyleFigure := StyleLine[StyleNumber];
+  figures[High(figures)].FillFigure := FillBrush[FillNumber];
+  figures[High(figures)].ColorFill:= ColorBrush;
   TRoundRectangle(figures[High(figures)]).ConstRound := ConstRectRound;
 end;
 
@@ -152,6 +154,8 @@ begin
   figures[High(figures)].ColorFigure := ColorLine;
   figures[High(figures)].WidthFigure := WidthLine;
   figures[High(figures)].StyleFigure := StyleLine[StyleNumber];
+  figures[High(figures)].FillFigure := FillBrush[FillNumber];
+  figures[High(figures)].ColorFill:= ColorBrush;
 end;
 
 procedure TToolEllipse.MouseMove(po: TPoint);
@@ -169,6 +173,8 @@ begin
   figures[High(figures)].ColorFigure := ColorLine;
   figures[High(figures)].WidthFigure := WidthLine;
   figures[High(figures)].StyleFigure := StyleLine[StyleNumber];
+  figures[High(figures)].FillFigure := FillBrush[FillNumber];
+  figures[High(figures)].ColorFill:= ColorBrush;
 end;
 
 procedure TToolRectangle.MouseMove(po: TPoint);

@@ -455,13 +455,13 @@ object MyForm: TMyForm
     ClientHeight = 411
     ClientWidth = 178
     TabOrder = 1
-    object ColorBox: TColorBox
+    object PenColorBox: TColorBox
       Left = 8
       Height = 22
       Top = 24
       Width = 164
       ItemHeight = 16
-      OnSelect = ColorBoxSelect
+      OnSelect = PenColorBoxSelect
       TabOrder = 0
       Visible = False
     end
@@ -522,28 +522,25 @@ object MyForm: TMyForm
       ItemHeight = 15
       ItemIndex = 0
       Items.Strings = (
-        'заполнение цветом фона'
-        'сплошная штриховка'
-        'горизонтальная штриховка'
+        'без заполнения'
+        'cплошная заливка'
+        '||| штриховка'
+        '= штриховка'
         '/// - штриховка'
-        '/// - штриховка толстыми линиями'
-        '\\\ - штриховка толстыми линиями'
         '\\\- штриховка'
         'заполнение прямой клеткой'
         'заполнение косой клеткой'
-        'заполнение частой сеткой'
-        'заполнение редкими точками'
-        'заполнение частыми точками'
       )
+      OnSelect = FillBoxSelect
       Style = csDropDownList
       TabOrder = 4
-      Text = 'заполнение цветом фона'
+      Text = 'без заполнения'
       Visible = False
     end
     object RoundListBox: TEdit
       Left = 8
       Height = 23
-      Top = 152
+      Top = 184
       Width = 152
       OnKeyPress = BoxKeyPress
       TabOrder = 5
@@ -553,7 +550,7 @@ object MyForm: TMyForm
     object UpDownRound: TUpDown
       Left = 160
       Height = 23
-      Top = 152
+      Top = 184
       Width = 12
       Associate = RoundListBox
       Increment = 5
@@ -564,6 +561,16 @@ object MyForm: TMyForm
       TabOrder = 6
       Visible = False
       Wrap = False
+    end
+    object BrushColorBox: TColorBox
+      Left = 8
+      Height = 24
+      Top = 152
+      Width = 164
+      ItemHeight = 16
+      OnSelect = BrushColorBoxSelect
+      TabOrder = 7
+      Visible = False
     end
   end
   object PaintPanel: TPanel

@@ -12,13 +12,14 @@ type
   { TMyForm }
 
   TMyForm = class(TForm)
+    BrushColorBox: TColorBox;
     StyleBox: TComboBox;
     FillBox: TComboBox;
     RoundListBox: TEdit;
     ScaleListBox: TEdit;
     LoupePlus: TBitBtn;
     LoupeMinus: TBitBtn;
-    ColorBox: TColorBox;
+    PenColorBox: TColorBox;
     PaintPanel: TPanel;
     HorizontalSB: TScrollBar;
     UpDownScale: TUpDown;
@@ -33,7 +34,9 @@ type
     PaintBox: TPaintBox;
     PanelTools: TPanel;
     Panel: TPanel;
-    procedure ColorBoxSelect(Sender: TObject);
+    procedure BrushColorBoxSelect(Sender: TObject);
+    procedure FillBoxSelect(Sender: TObject);
+    procedure PenColorBoxSelect(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure BoxKeyPress(Sender: TObject; var Key: char);
     procedure StyleBoxSelect(Sender: TObject);
@@ -122,9 +125,19 @@ begin
   paintbox.Invalidate;
 end;
 
-procedure TMyForm.ColorBoxSelect(Sender: TObject);
+procedure TMyForm.PenColorBoxSelect(Sender: TObject);
 begin
-  ColorLine := ColorBox.Selected;
+  ColorLine := PenColorBox.Selected;
+end;
+
+procedure TMyForm.FillBoxSelect(Sender: TObject);
+begin
+  FillNumber := FillBox.ItemIndex;
+end;
+
+procedure TMyForm.BrushColorBoxSelect(Sender: TObject);
+begin
+
 end;
 
 procedure TMyForm.PaintBoxMouseDown(Sender: TObject; Button: TMouseButton;
@@ -186,10 +199,11 @@ end;
 
 procedure TMyForm.Param;
 begin
-  ColorBox.Visible := ToolKod in [0..5];
+  PenColorBox.Visible := ToolKod in [0..5];
   ScaleListBox.Visible := ToolKod in [0..5];
   StyleBox.Visible := ToolKod in [0..5];
   FillBox.Visible := ToolKod in [3..5];
+  BrushColorBox.Visible := ToolKod in [3..5];
   RoundListBox.Visible := ToolKod = 5;
 end;
 

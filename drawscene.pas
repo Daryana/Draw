@@ -5,7 +5,7 @@ unit DrawScene;
 interface
 
 uses
-  Classes, SysUtils, Figure, Graphics, crt, Graph, UTypes;
+  Classes, SysUtils, Figure, Graphics, crt, Graph, UTypes, WorldPole;
 type
 
   { TScene }
@@ -14,6 +14,7 @@ type
   public
     procedure PBDraw(canvas: TCanvas);
     procedure PBClear();
+    procedure Centre(W, H: integer);
 end;
  var
    Scene: TScene;
@@ -53,6 +54,30 @@ var
 begin
   for i := 0 to High(figures) do figures[i].free;
     SetLength(figures, 0);
+end;
+
+procedure TScene.Centre(W, H: integer);
+var
+  d: Extended;
+  p: TRect;
+begin
+  p.BottomRight := Pole.WorldToLocal(PMax);
+  p.TopLeft := Pole.WorldToLocal(PMin);
+  if ((P.Bottom <> P.Top) and (P.Left <> P.Right)) then
+  begin
+    if (W / (p.BottomRight.x - p.TopLeft.x)) < (H / (p.BottomRight.y - p.TopLeft.y)) then
+    begin
+      d := W / (p.BottomRight.x - p.TopLeft.x);
+      if (Pole.Zoom <= 100) then Pole.Zoom *= W / (p.BottomRight.x - p.TopLeft.x);
+    end
+    else
+    begin
+      d := H / (p.BottomRight.y - p.TopLeft.y);
+      if (Pole.Zoom <= 100) then Pole.Zoom *=  H / (p.BottomRight.y - p.TopLeft.y);
+    end;
+    Pole.Shift.x += (((w / 2) - ((((p.BottomRight.x - p.TopLeft.x) * d) / 2) + p.TopLeft.x * (d))) / (Pole.Zoom));
+    Pole.Shift.y += (((h / 2) - ((((p.BottomRight.y - p.TopLeft.y) * d) / 2) + p.TopLeft.y * (d))) / (Pole.Zoom));
+  end;
 end;
 
 

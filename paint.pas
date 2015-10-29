@@ -17,6 +17,7 @@ type
     LabelZoom: TLabel;
     MenuShift: TMenuItem;
     MenuZoom: TMenuItem;
+    PanelZoom: TPanel;
     PanelPaint: TPanel;
     HScrollBar: TScrollBar;
     VScrollBar: TScrollBar;
@@ -40,7 +41,9 @@ type
     Panel: TPanel;
     procedure BrushColorBoxSelect(Sender: TObject);
     procedure FillBoxSelect(Sender: TObject);
-    procedure HScrollBarChange(Sender: TObject);
+    procedure HScrollBarScroll(Sender: TObject; ScrollCode: TScrollCode;
+      var ScrollPos: Integer);
+    procedure MenuZoomClick(Sender: TObject);
     procedure PenColorBoxSelect(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure BoxKeyPress(Sender: TObject; var Key: char);
@@ -60,7 +63,8 @@ type
     procedure UpDownRoundChanging(Sender: TObject; var AllowChange: Boolean);
     procedure UpDownScaleChanging(Sender: TObject; var AllowChange: Boolean);
     Procedure Param;
-    procedure VScrollBarChange(Sender: TObject);
+    procedure VScrollBarScroll(Sender: TObject; ScrollCode: TScrollCode;
+      var ScrollPos: Integer);
   private
     DownMouseFlag: boolean;
     ToolKod: integer;
@@ -145,9 +149,16 @@ begin
   FillNumber := FillBox.ItemIndex;
 end;
 
-procedure TMyForm.HScrollBarChange(Sender: TObject);
+procedure TMyForm.HScrollBarScroll(Sender: TObject; ScrollCode: TScrollCode;
+  var ScrollPos: Integer);
 begin
+  Pole.Shift.x -= HScrollBar.Position;
+end;
 
+procedure TMyForm.MenuZoomClick(Sender: TObject);
+begin
+  Scene.Centre(PaintBox.Width, PaintBox.Height);
+  PaintBox.Invalidate;
 end;
 
 procedure TMyForm.BrushColorBoxSelect(Sender: TObject);
@@ -211,7 +222,7 @@ begin
   if (PMax.x > Pole.LocalToWorld(Point(PaintBox.Width, PaintBox.Height)).x) then
     HScrollBar.Max := HScrollBar.Max + trunc(PMax.x - Pole.LocalToWorld(Point(PaintBox.Width, PaintBox.Height)).x);
   if (PMax.y > Pole.LocalToWorld(Point(PaintBox.Width, PaintBox.Height)).y) then
-    VScrollBar.Max := VScrollBar.Max + trunc(PMax.y - Pole.LocalToWorld(Point(PaintBox.Width, PaintBox.Height)).y);}
+    VScrollBar.Max := VScrollBar.Max + trunc(PMax.y - Pole.LocalToWorld(Point(PaintBox.Width, PaintBox.Height)).y);    }
 end;
 
 procedure TMyForm.ButtonToolClick(Sender: TObject);
@@ -256,9 +267,10 @@ begin
   RoundListBox.Visible := ToolKod = 5;
 end;
 
-procedure TMyForm.VScrollBarChange(Sender: TObject);
+procedure TMyForm.VScrollBarScroll(Sender: TObject; ScrollCode: TScrollCode;
+  var ScrollPos: Integer);
 begin
-
+  Pole.Shift.y -= VScrollBar.Position;
 end;
 
 

@@ -79,6 +79,9 @@ type
      procedure Finish(po: TPoint); override;
      procedure FreeLine(po: TPoint);
    end;
+var
+     PMax: TFloatPoint;
+     PMin: TFloatPoint;
 implementation
 
 { TRectangle }
@@ -91,6 +94,10 @@ end;
 procedure TRectangle.Draw(canvas: TCanvas);
 begin
   canvas.Rectangle(ToRect(Pole.WorldToLocal(r.Top), Pole.WorldToLocal(r.Bottom)));
+  if r.Top > PMax then PMax := r.Top;
+  if r.Top < PMin then PMin := r.Top;
+  if r.Bottom > PMax then PMax := r.Bottom;
+  if r.Bottom < PMin then PMin := r.Bottom;
 end;
 
 procedure TRectangle.Finish(po: TPoint);
@@ -108,6 +115,10 @@ end;
 procedure TEllipse.Draw(canvas: TCanvas);
 begin
   canvas.Ellipse(ToRect(Pole.WorldToLocal(r.Top), Pole.WorldToLocal(r.Bottom)));
+  if r.Top > PMax then PMax := r.Top;
+  if r.Top < PMin then PMin := r.Top;
+  if r.Bottom > PMax then PMax := r.Bottom;
+  if r.Bottom < PMin then PMin := r.Bottom;
 end;
 
 procedure TEllipse.Finish(po: TPoint);
@@ -126,6 +137,10 @@ end;
 procedure TLine.Draw(canvas: TCanvas);
 begin
   canvas.Line(Pole.WorldToLocal(r.Top), Pole.WorldToLocal(r.Bottom));
+  if r.Top > PMax then PMax := r.Top;
+  if r.Top < PMin then PMin := r.Top;
+  if r.Bottom > PMax then PMax := r.Bottom;
+  if r.Bottom < PMin then PMin := r.Bottom;
 end;
 
 procedure TLine.Finish(po: TPoint);
@@ -143,6 +158,10 @@ end;
 procedure TRoundRectangle.Draw(canvas: TCanvas);
 begin
   canvas.RoundRect(ToRect(Pole.WorldToLocal(r.Top), Pole.WorldToLocal(r.Bottom)), ConstRound, ConstRound);
+  if r.Top > PMax then PMax := r.Top;
+  if r.Top < PMin then PMin := r.Top;
+  if r.Bottom > PMax then PMax := r.Bottom;
+  if r.Bottom < PMin then PMin := r.Bottom;
 end;
 
 procedure TRoundRectangle.Finish(po: TPoint);
@@ -164,7 +183,11 @@ var
   i: integer;
 begin
   for i := 0 to High(p) - 1 do
+  begin
     canvas.Line(Pole.WorldToLocal(p[i]), Pole.WorldToLocal(p[i + 1]));
+    if p[i] > PMax then PMax := p[i];
+    if p[i] < PMin then PMin := p[i];
+  end;
 end;
 
 procedure TPolyLine.Finish(po: TPoint);

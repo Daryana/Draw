@@ -6,13 +6,20 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
   Buttons, Menus, StdCtrls, CheckLst, ColorBox, ComCtrls, typinfo, ctool,
-  DrawScene, WorldPole;
+  DrawScene, WorldPole, UTypes, Figure;
 type
 
   { TMyForm }
 
   TMyForm = class(TForm)
     BrushColorBox: TColorBox;
+    EditZoom: TEdit;
+    LabelZoom: TLabel;
+    MenuShift: TMenuItem;
+    MenuZoom: TMenuItem;
+    PanelPaint: TPanel;
+    HScrollBar: TScrollBar;
+    VScrollBar: TScrollBar;
     StyleBox: TComboBox;
     FillBox: TComboBox;
     RoundListBox: TEdit;
@@ -20,11 +27,8 @@ type
     LoupePlus: TBitBtn;
     LoupeMinus: TBitBtn;
     PenColorBox: TColorBox;
-    PaintPanel: TPanel;
-    HorizontalSB: TScrollBar;
     UpDownScale: TUpDown;
     UpDownRound: TUpDown;
-    VerticalSB: TScrollBar;
     TToolClear: TBitBtn;
     MainMenu: TMainMenu;
     MenuItemFile: TMenuItem;
@@ -36,6 +40,7 @@ type
     Panel: TPanel;
     procedure BrushColorBoxSelect(Sender: TObject);
     procedure FillBoxSelect(Sender: TObject);
+    procedure HScrollBarChange(Sender: TObject);
     procedure PenColorBoxSelect(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure BoxKeyPress(Sender: TObject; var Key: char);
@@ -55,6 +60,7 @@ type
     procedure UpDownRoundChanging(Sender: TObject; var AllowChange: Boolean);
     procedure UpDownScaleChanging(Sender: TObject; var AllowChange: Boolean);
     Procedure Param;
+    procedure VScrollBarChange(Sender: TObject);
   private
     DownMouseFlag: boolean;
     ToolKod: integer;
@@ -97,8 +103,10 @@ begin
     b.tag := i;
     b.OnClick:=@ButtonToolClick;
   end;
-  PoleZoom := 1;
+  Pole := TPole.Create(PaintBox.Width, PaintBox.Height);
+  EditZoom.Text := FloatToStr(Pole.Zoom * 100);
   MyForm.Param;
+  PMin := ToFloatPoint(10000, 10000);
 end;
 
 procedure TMyForm.BoxKeyPress(Sender: TObject; var Key: char);
@@ -113,15 +121,17 @@ end;
 
 procedure TMyForm.ToolLoupePlusClick(Sender: TObject);
 begin
-  Scene.PBLoupe('+');
+  Pole.PorMLoupe('+');
   PLineFlag := False;
+  EditZoom.Text := FloatToStr(Pole.Zoom * 100);
   paintbox.Invalidate;
 end;
 
 procedure TMyForm.ToolLoupeMinusClick(Sender: TObject);
 begin
-  Scene.PBLoupe('-');
+  Pole.PorMLoupe('-');
   PLineFlag := False;
+  EditZoom.Text := FloatToStr(Pole.Zoom * 100);
   paintbox.Invalidate;
 end;
 
@@ -135,9 +145,14 @@ begin
   FillNumber := FillBox.ItemIndex;
 end;
 
-procedure TMyForm.BrushColorBoxSelect(Sender: TObject);
+procedure TMyForm.HScrollBarChange(Sender: TObject);
 begin
 
+end;
+
+procedure TMyForm.BrushColorBoxSelect(Sender: TObject);
+begin
+  ColorBrush := BrushColorBox.Selected;
 end;
 
 procedure TMyForm.PaintBoxMouseDown(Sender: TObject; Button: TMouseButton;
@@ -157,7 +172,7 @@ procedure TMyForm.PaintBoxMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: integer);
 begin
   if DownMouseFlag then
-      consttool.tool[ToolKod].MouseMove(Point(x, y));
+    consttool.tool[ToolKod].MouseMove(Point(x, y));
   paintbox.Invalidate;
 end;
 
@@ -165,11 +180,38 @@ procedure TMyForm.PaintBoxMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: integer);
 begin
   DownMouseFlag:= false;
+  if (ToolKod = 7) then
+  begin
+    Pole.loupeRect(PaintBox.Width, PaintBox.Height);
+    EditZoom.Text := FloatToStr(Pole.Zoom * 100);
+  end;
+  paintbox.Invalidate;
 end;
 
 procedure TMyForm.PaintBoxPaint(Sender: TObject);
 begin
+  UpDownScale.Position := trunc(pole.Zoom);
+  if UpDownScale.Position = 0 then UpDownScale.Position := 1;
+    DWidthLine := UpDownScale.Position;
+  pole.Zoom := StrToFloat(EditZoom.Text) /100;
   Scene.PBDraw(PaintBox.Canvas);
+  if (ToolKod = 7) and DownMouseFlag then
+  begin
+    PaintBox.canvas.Pen.Style := psDot;
+    PaintBox.canvas.Brush.Style := bsClear;
+    PaintBox.canvas.Pen.Color := clGray;
+    PaintBox.Canvas.Rectangle(Pole.PRect);
+  end;
+  {if ((HScrollBar.max - HScrollBar.min) <> 0) and (Pmin <> ToFloatPoint(10000, 10000)) then HScrollBar.Visible := True else HScrollBar.Visible := False;
+  if ((VScrollBar.max - VScrollBar.min) <> 0) then VScrollBar.Visible := True else VScrollBar.Visible := False;
+  if (Pmin.x < Pole.LocalToWorld(Point(0, 0)).x) and (Pmin <> ToFloatPoint(10000, 10000)) then
+    HScrollBar.Min := HScrollBar.Min - trunc(PMin.x - Pole.LocalToWorld(Point(0, 0)).x);
+  if (Pmin.y < Pole.LocalToWorld(Point(0, 0)).y) and (Pmin <> ToFloatPoint(10000, 10000)) then
+    VScrollBar.Min := VScrollBar.Min - trunc(PMin.y - Pole.LocalToWorld(Point(0, 0)).y);
+  if (PMax.x > Pole.LocalToWorld(Point(PaintBox.Width, PaintBox.Height)).x) then
+    HScrollBar.Max := HScrollBar.Max + trunc(PMax.x - Pole.LocalToWorld(Point(PaintBox.Width, PaintBox.Height)).x);
+  if (PMax.y > Pole.LocalToWorld(Point(PaintBox.Width, PaintBox.Height)).y) then
+    VScrollBar.Max := VScrollBar.Max + trunc(PMax.y - Pole.LocalToWorld(Point(PaintBox.Width, PaintBox.Height)).y);}
 end;
 
 procedure TMyForm.ButtonToolClick(Sender: TObject);
@@ -182,7 +224,14 @@ end;
 procedure TMyForm.TToolClearClick(Sender: TObject);
 begin
   Scene.PBClear();
+  DWidthLine := 0;
+  UpDownScale.Position := 1;
   PLineFlag := False;
+  Pole.Zoom := 1;
+  Pole.Shift := ToFloatPoint(0, 0);
+  EditZoom.Text := '100';
+  PMin := ToFloatPoint(10000, 10000);
+  PMax := ToFloatPoint(0, 0);
   paintbox.Invalidate;
 end;
 
@@ -205,6 +254,11 @@ begin
   FillBox.Visible := ToolKod in [3..5];
   BrushColorBox.Visible := ToolKod in [3..5];
   RoundListBox.Visible := ToolKod = 5;
+end;
+
+procedure TMyForm.VScrollBarChange(Sender: TObject);
+begin
+
 end;
 
 

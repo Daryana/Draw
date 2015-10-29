@@ -5,7 +5,7 @@ unit Tool;
 interface
 
 uses
-  Classes, SysUtils, Figure, Graphics, crt, CTool, DrawScene, WorldPole;
+  Classes, SysUtils, Figure, Graphics, crt, CTool, DrawScene, WorldPole, UTypes;
 type
   { TToolPen }
 
@@ -60,29 +60,45 @@ type
 
   TToolHand = class (TTool)
   private
-    tx, ty: Extended;
+    t: TFloatPoint;
   public
     procedure MouseDown(po: TPoint);  override;
     procedure MouseMove(po: TPoint);  override;
   end;
 
+  { TToolLoupe }
+
+  TToolLoupe = class (TTool)
+  public
+    procedure MouseDown(po: TPoint);  override;
+    procedure MouseMove(po: TPoint);  override;
+  end;
 
 implementation
+
+{ TToolLoupe }
+
+procedure TToolLoupe.MouseDown(po: TPoint);
+begin
+  Pole.PRect.TopLeft := po;
+end;
+
+procedure TToolLoupe.MouseMove(po: TPoint);
+begin
+  Pole.PRect.BottomRight := po;
+end;
 
 { TToolHand }
 
 procedure TToolHand.MouseDown(po: TPoint);
 begin
-  tx := po.x;
-  ty := po.y;
+  t := ToFloatPoint(po);
 end;
 
 procedure TToolHand.MouseMove(po: TPoint);
 begin
-  PoleShift.X += trunc(po.x - tx);
-  PoleShift.Y += trunc(po.y - ty);
-  tx := po.x;
-  ty := po.y;
+  Pole.Shift += (ToFloatPoint(po) - t) / Pole.Zoom;
+  t := ToFloatPoint(po);
 end;
 
 { TToolPolyLine }
@@ -208,6 +224,7 @@ initialization
  ConstTool.ToolRegister(TToolRectangle);
  ConstTool.ToolRegister(TToolRoundRectangle);
  ConstTool.ToolRegister(TToolHand);
+ ConstTool.ToolRegister(TToolLoupe);
 finalization
  ConstTool.free;
 

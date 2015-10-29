@@ -27,6 +27,7 @@ type
   function ToFloatPoint(p: TPoint): TFloatPoint;
   function ToFloatRect(p1, p2: TFloatPoint):TFloatRect;
   function ToRect(p1, p2: TPoint):TRect;
+  function ToRect(r: TFloatRect):TRect;
   operator +(a, b: TFloatPoint):TFloatPoint;
   operator -(a, b: TFloatPoint):TFloatPoint;
   operator +(a, b: TPoint):TPoint;
@@ -37,6 +38,7 @@ type
   operator <(a, b: TFloatPoint):boolean;
   operator >=(a, b: TFloatPoint):boolean;
   operator <=(a, b: TFloatPoint):boolean;
+  operator =(a, b: TFloatPoint):boolean;
   operator /(a: TFloatPoint; b: Extended):TFloatPoint;
   operator *(a: TFloatPoint; b: Extended):TFloatPoint;
 
@@ -64,6 +66,14 @@ function ToRect(p1, p2: TPoint): TRect;
 begin
   Result.TopLeft := p1;
   Result.BottomRight := p2;
+end;
+
+function ToRect(r: TFloatRect): TRect;
+begin
+  Result.Left := trunc(r.Top.x);
+  Result.Top := trunc(r.Top.y);
+  Result.Right := trunc(r.Bottom.x);
+  Result.Bottom := trunc(r.Bottom.y);
 end;
 
 operator+(a, b: TFloatPoint): TFloatPoint;
@@ -120,6 +130,11 @@ end;
 operator<=(a, b: TFloatPoint): boolean;
 begin
   result:= (a.x <= b.x) and (a.y <= b.y);
+end;
+
+operator=(a, b: TFloatPoint): boolean;
+begin
+  result:= (a.x = b.x) and (a.y = b.y);
 end;
 
 operator/(a: TFloatPoint; b: Extended): TFloatPoint;

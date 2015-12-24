@@ -1,27 +1,29 @@
 object MyForm: TMyForm
-  Left = 213
-  Height = 468
-  Top = 115
-  Width = 725
+  Left = 176
+  Height = 538
+  Top = 198
+  Width = 869
   Caption = 'Редактор'
-  ClientHeight = 448
-  ClientWidth = 725
+  ClientHeight = 0
+  ClientWidth = 0
   Color = clWindow
   Menu = MainMenu
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   LCLVersion = '1.4.0.4'
   object PanelTools: TPanel
     Left = 0
     Height = 37
     Top = 0
-    Width = 725
+    Width = 0
     Align = alTop
     Caption = ' '
     ClientHeight = 37
-    ClientWidth = 725
+    ClientWidth = 0
     TabOrder = 0
     object TToolClear: TBitBtn
-      Left = 71
+      Left = 0
       Height = 35
       Top = 1
       Width = 35
@@ -162,7 +164,7 @@ object MyForm: TMyForm
       TabOrder = 0
     end
     object LoupeMinus: TBitBtn
-      Left = 36
+      Left = 0
       Height = 35
       Top = 1
       Width = 35
@@ -303,7 +305,7 @@ object MyForm: TMyForm
       TabOrder = 1
     end
     object LoupePlus: TBitBtn
-      Left = 1
+      Left = 0
       Height = 35
       Top = 1
       Width = 35
@@ -444,154 +446,36 @@ object MyForm: TMyForm
       TabOrder = 2
     end
   end
-  object Panel: TPanel
-    AnchorSideLeft.Side = asrBottom
+  object PanelEdit: TPanel
     Left = 0
-    Height = 411
-    Top = 37
-    Width = 178
+    Height = 0
+    Top = 0
+    Width = 320
     Align = alLeft
     Caption = ' '
-    ClientHeight = 411
-    ClientWidth = 178
+    ClientHeight = 0
+    ClientWidth = 320
     TabOrder = 1
-    object PenColorBox: TColorBox
-      Left = 8
-      Height = 22
-      Top = 24
-      Width = 164
-      ItemHeight = 16
-      OnSelect = PenColorBoxSelect
-      TabOrder = 0
-      Visible = False
-    end
-    object UpDownScale: TUpDown
-      AnchorSideLeft.Control = ScaleListBox
-      AnchorSideTop.Control = ScaleListBox
-      AnchorSideRight.Control = ScaleListBox
-      AnchorSideRight.Side = asrBottom
-      AnchorSideBottom.Control = ScaleListBox
-      AnchorSideBottom.Side = asrBottom
-      Left = 160
-      Height = 23
-      Top = 56
-      Width = 12
-      Anchors = [akTop, akBottom]
-      Associate = ScaleListBox
-      Min = 1
-      OnChanging = UpDownScaleChanging
-      Position = 1
-      TabOrder = 1
-      Visible = False
-      Wrap = False
-    end
-    object ScaleListBox: TEdit
-      Left = 8
-      Height = 23
-      Top = 56
-      Width = 152
-      OnKeyPress = BoxKeyPress
-      TabOrder = 2
-      Text = '1'
-      Visible = False
-    end
-    object StyleBox: TComboBox
-      Left = 8
-      Height = 23
-      Top = 88
-      Width = 164
-      ItemHeight = 15
-      ItemIndex = 0
-      Items.Strings = (
-        'Сплошной'
-        'Штриховой'
-        'Пунктирный'
-        'Штрихпунктироное 1'
-        'Штрихпунктироное 2'
-      )
-      OnSelect = StyleBoxSelect
-      Style = csDropDownList
-      TabOrder = 3
-      Text = 'Сплошной'
-      Visible = False
-    end
-    object FillBox: TComboBox
-      Left = 8
-      Height = 23
-      Top = 120
-      Width = 164
-      ItemHeight = 15
-      ItemIndex = 0
-      Items.Strings = (
-        'без заполнения'
-        'cплошная заливка'
-        '||| штриховка'
-        '= штриховка'
-        '/// - штриховка'
-        '\\\- штриховка'
-        'заполнение прямой клеткой'
-        'заполнение косой клеткой'
-      )
-      OnSelect = FillBoxSelect
-      Style = csDropDownList
-      TabOrder = 4
-      Text = 'без заполнения'
-      Visible = False
-    end
-    object RoundListBox: TEdit
-      Left = 8
-      Height = 23
-      Top = 184
-      Width = 152
-      OnKeyPress = BoxKeyPress
-      TabOrder = 5
-      Text = '5'
-      Visible = False
-    end
-    object UpDownRound: TUpDown
-      Left = 160
-      Height = 23
-      Top = 184
-      Width = 12
-      Associate = RoundListBox
-      Increment = 5
-      Max = 150
-      Min = 5
-      OnChanging = UpDownRoundChanging
-      Position = 5
-      TabOrder = 6
-      Visible = False
-      Wrap = False
-    end
-    object BrushColorBox: TColorBox
-      Left = 8
-      Height = 22
-      Top = 152
-      Width = 164
-      ItemHeight = 16
-      OnSelect = BrushColorBoxSelect
-      TabOrder = 7
-      Visible = False
-    end
     object PanelZoom: TPanel
       Left = 1
-      Height = 58
-      Top = 352
-      Width = 176
+      Height = 40
+      Top = -40
+      Width = 318
       Align = alBottom
       Caption = ' '
-      ClientHeight = 58
-      ClientWidth = 176
-      TabOrder = 8
+      ClientHeight = 40
+      ClientWidth = 318
+      TabOrder = 0
       object EditZoom: TEdit
-        Left = 24
+        Left = 8
         Height = 23
         Top = 8
         Width = 80
         TabOrder = 0
+        Text = '100'
       end
       object LabelZoom: TLabel
-        Left = 112
+        Left = 104
         Height = 15
         Top = 16
         Width = 16
@@ -599,47 +483,89 @@ object MyForm: TMyForm
         ParentColor = False
       end
     end
+    object PaletteGrid: TDrawGrid
+      Left = 71
+      Height = 120
+      Top = 320
+      Width = 241
+      AutoEdit = False
+      ColCount = 12
+      DefaultColWidth = 20
+      DefaultRowHeight = 20
+      ExtendedSelect = False
+      FixedCols = 9
+      FixedRows = 6
+      Flat = True
+      HeaderHotZones = []
+      HeaderPushZones = []
+      MouseWheelOption = mwGrid
+      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine]
+      RowCount = 6
+      ScrollBars = ssNone
+      TabOrder = 1
+      TabStop = False
+      TitleFont.Color = clBackground
+      OnDblClick = PaletteGridDblClick
+      OnDrawCell = PaletteGridDrawCell
+      OnMouseDown = PaletteGridMouseDown
+    end
+    object BrushColor: TShape
+      Left = 24
+      Height = 40
+      Top = 352
+      Width = 40
+      OnMouseDown = BrushColorMouseDown
+    end
+    object PenColor: TShape
+      Left = 8
+      Height = 40
+      Top = 360
+      Width = 40
+      Brush.Color = clBackground
+      OnMouseDown = PenColorMouseDown
+    end
   end
   object PanelPaint: TPanel
-    Left = 178
-    Height = 411
-    Top = 37
-    Width = 547
+    Left = 0
+    Height = 0
+    Top = 0
+    Width = 0
     Align = alClient
-    ClientHeight = 411
-    ClientWidth = 547
+    ClientHeight = 0
+    ClientWidth = 0
     TabOrder = 2
     object PaintBox: TPaintBox
-      Left = 1
-      Height = 392
-      Top = 1
-      Width = 528
+      Left = 0
+      Height = 0
+      Top = 0
+      Width = 0
       Align = alClient
       OnMouseDown = PaintBoxMouseDown
       OnMouseMove = PaintBoxMouseMove
       OnMouseUp = PaintBoxMouseUp
+      OnMouseWheel = PaintBoxMouseWheel
       OnPaint = PaintBoxPaint
     end
     object HScrollBar: TScrollBar
-      Left = 1
+      Left = 0
       Height = 17
-      Top = 393
-      Width = 545
+      Top = -17
+      Width = 0
       Align = alBottom
-      Max = 0
+      Max = 999
       PageSize = 0
       TabOrder = 0
       Visible = False
       OnScroll = HScrollBarScroll
     end
     object VScrollBar: TScrollBar
-      Left = 529
-      Height = 392
-      Top = 1
+      Left = -17
+      Height = 0
+      Top = 0
       Width = 17
       Align = alRight
       Kind = sbVertical
-      Max = 0
+      Max = 999
       PageSize = 0
       TabOrder = 1
       Visible = False
@@ -647,11 +573,69 @@ object MyForm: TMyForm
     end
   end
   object MainMenu: TMainMenu
-    left = 496
+    left = 464
+    top = 104
     object MenuItemFile: TMenuItem
       Caption = 'Файл'
+      object MenuNew: TMenuItem
+        Caption = 'Новый'
+        ShortCut = 16462
+        OnClick = MenuNewClick
+      end
+      object Open: TMenuItem
+        Caption = 'Открыть'
+        ShortCut = 16463
+        OnClick = OpenClick
+      end
+      object Save: TMenuItem
+        Caption = 'Сохранить '
+        ShortCut = 16467
+        OnClick = SaveClick
+      end
+      object SaveAs: TMenuItem
+        Caption = 'Сохранить как'
+        ShortCut = 24659
+        OnClick = SaveAsClick
+      end
+      object MenuExport: TMenuItem
+        Caption = 'Экспорт'
+        OnClick = MenuExportClick
+      end
       object MenuItemExit: TMenuItem
         Caption = 'Выход'
+        OnClick = MenuItemExitClick
+      end
+    end
+    object MenuShape: TMenuItem
+      Caption = 'Правка'
+      object MenuAgo: TMenuItem
+        Caption = 'Отменить'
+        ShortCut = 16474
+        OnClick = MenuAgoClick
+      end
+      object MenuNext: TMenuItem
+        Caption = 'Вернуться'
+        ShortCut = 24666
+        OnClick = MenuNextClick
+      end
+      object MenuCopy: TMenuItem
+        Caption = 'Копировать'
+        ShortCut = 16451
+        OnClick = MenuCopyClick
+      end
+      object MenuPaste: TMenuItem
+        Caption = 'Вставить'
+        ShortCut = 16470
+        OnClick = MenuPasteClick
+      end
+      object MenuDelete: TMenuItem
+        Caption = 'Удалить фигуры'
+        ShortCut = 46
+        OnClick = MenuDeleteClick
+      end
+      object MenuClear: TMenuItem
+        Caption = 'Очистить'
+        OnClick = MenuClearClick
       end
     end
     object MenuShift: TMenuItem
@@ -659,6 +643,16 @@ object MyForm: TMyForm
       object MenuZoom: TMenuItem
         Caption = 'на весь экран'
         OnClick = MenuZoomClick
+      end
+      object MenuDrawLayerUp: TMenuItem
+        Caption = 'сдвинуть вверх'
+        ShortCut = 16422
+        OnClick = MenuDrawLayerUpClick
+      end
+      object MenuDrawLayerDown: TMenuItem
+        Caption = 'сдвинуть вниз'
+        ShortCut = 16424
+        OnClick = MenuDrawLayerDownClick
       end
     end
     object MenuItemFAQ: TMenuItem
@@ -668,5 +662,48 @@ object MyForm: TMyForm
         OnClick = MenuItemAutorClick
       end
     end
+  end
+  object ColorDialog: TColorDialog
+    Color = clBlack
+    CustomColors.Strings = (
+      'ColorA=000000'
+      'ColorB=000080'
+      'ColorC=008000'
+      'ColorD=008080'
+      'ColorE=800000'
+      'ColorF=800080'
+      'ColorG=808000'
+      'ColorH=808080'
+      'ColorI=C0C0C0'
+      'ColorJ=0000FF'
+      'ColorK=00FF00'
+      'ColorL=00FFFF'
+      'ColorM=FF0000'
+      'ColorN=FF00FF'
+      'ColorO=FFFF00'
+      'ColorP=FFFFFF'
+      'ColorQ=C0DCC0'
+      'ColorR=F0CAA6'
+      'ColorS=F0FBFF'
+      'ColorT=A4A0A0'
+    )
+    left = 504
+    top = 104
+  end
+  object SaveDialog: TSaveDialog
+    DefaultExt = '.txt'
+    Filter = 'MyImage|*.txt'
+    InitialDir = 'C:\Users\User\Documents\Save'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofExtensionDifferent, ofPathMustExist, ofNoReadOnlyReturn, ofEnableSizing, ofViewDetail]
+    left = 544
+    top = 104
+  end
+  object OpenDialog: TOpenDialog
+    DefaultExt = '.txt'
+    Filter = 'MyImage|*.txt'
+    InitialDir = 'C:\Users\User\Documents\Save'
+    Options = [ofPathMustExist, ofFileMustExist, ofCreatePrompt, ofNoTestFileCreate, ofEnableSizing, ofViewDetail]
+    left = 584
+    top = 104
   end
 end

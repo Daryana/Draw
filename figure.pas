@@ -5,7 +5,7 @@ unit Figure;
 interface
 
 uses
-  Classes, SysUtils, Graphics, crt, Graph, UTransform, UTypes, FPCanvas, typinfo, XMLWrite, DOM;
+  Classes, SysUtils, Graphics, crt, Graph, UTransform, UTypes, FPCanvas, typinfo, XMLWrite, DOM, Dialogs;
 
 type
 
@@ -38,7 +38,6 @@ type
      procedure ExportSVG(node: TDOMElement; svg: TXMLDocument; minp: TFloatPoint); virtual; Abstract;
    published
      property WidthFigure: integer read FPW write FPW;
-     property FPenStyle: TFPPenStyle read FPS write FPS;
      property FPenColor: TColor read FPC write FPC;
    end;
 
@@ -61,7 +60,6 @@ type
      procedure Save; override;
      procedure OpenF(s: string); override;
    published
-     property FBrushStyle: TFPBrushStyle read FBS write FBS;
      property FBrushColor: TColor read FBC write FBC;
    end;
 
@@ -75,6 +73,9 @@ type
      procedure Save; override;
      procedure OpenF(s: string); override;
      procedure ExportSVG(node: TDOMElement; svg: TXMLDocument; minp: TFloatPoint); override;
+   published
+     property FPenStyle: TFPPenStyle read FPS write FPS;
+     property FBrushStyle: TFPBrushStyle read FBS write FBS;
    end;
 
    { TEllipse }
@@ -87,6 +88,9 @@ type
      procedure save; override;
      procedure OpenF(s: string); override;
      procedure ExportSVG(node: TDOMElement; svg: TXMLDocument; minp: TFloatPoint); override;
+   published
+     property FPenStyle: TFPPenStyle read FPS write FPS;
+     property FBrushStyle: TFPBrushStyle read FBS write FBS;
    end;
 
    { TRoundRectangle }
@@ -102,7 +106,27 @@ type
      procedure OpenF(s: string); override;
      procedure ExportSVG(node: TDOMElement; svg: TXMLDocument; minp: TFloatPoint); override;
    published
+     property FPenStyle: TFPPenStyle read FPS write FPS;
      property FRoundRect: LongInt read FRR write FRR;
+     property FBrushStyle: TFPBrushStyle read FBS write FBS;
+   end;
+
+   { TTextRectengl }
+
+   TTextRectengl = class(TRemRectFigure)
+   private
+     FTR: AnsiString;
+     FTS: AnsiString;
+   public
+     constructor Create;
+     procedure Draw(canvas: TCanvas); override;
+     procedure DrawM(canvas: TCanvas); override;
+     procedure Save; override;
+     procedure OpenF(s: string); override;
+     procedure ExportSVG(node: TDOMElement; svg: TXMLDocument; minp: TFloatPoint); override;
+   published
+     property FTextRect: AnsiString read FTR write FTR;
+     property FTextName: AnsiString read FTS write FTS;
    end;
 
    { TPolyLine }
@@ -121,9 +145,76 @@ type
      procedure Save; override;
      procedure OpenF(s: string); override;
      procedure ExportSVG(node: TDOMElement; svg: TXMLDocument; minp: TFloatPoint); override;
+   published
+     property FPenStyle: TFPPenStyle read FPS write FPS;
    end;
 
 implementation
+
+{ TTextRectengl }
+
+constructor TTextRectengl.Create;
+begin
+  FPW := 1;
+  FPS := psSolid;
+  FBS := bsClear;
+  FBC := clWhite;
+  isSelected := True;
+  FTR := ' ';
+  FTS := 'Times New Roman';
+  Del := False;
+end;
+
+procedure TTextRectengl.Draw(canvas: TCanvas);
+var
+  x, y: integer;
+  style: TTextStyle;
+begin
+  style := Canvas.TextStyle;
+  r.Top += ToFloatPoint(FSX, FSY);
+  r.Bottom += ToFloatPoint(FSX, FSY);
+  FMax := maxPoint(r.Top,  r.Bottom);
+  FMin := minPoint(r.Top,  r.Bottom);
+  FSX := 0;
+  FSY := 0;
+  x := Field.WorldToLocal(swaprect(r).Top).x + 3;
+  y := Field.WorldToLocal(swaprect(r).Top).y + TextHeight(FTR);
+  style.Wordbreak := True;
+  style.SingleLine := False;
+  style.Clipping := False;
+  style.Opaque := True;
+  canvas.Brush.Color := FBC;
+  canvas.Font.Color := FPC;
+  canvas.Font.Size := FPW * 3;
+  canvas.Font.Name := FTS;
+  canvas.TextRect(ToRect(Field.WorldToLocal(r.Top), Field.WorldToLocal(r.Bottom)), x, y, FTR, style);
+end;
+
+procedure TTextRectengl.DrawM(canvas: TCanvas);
+begin
+  inherited DrawM(canvas);
+  canvas.Rectangle(ToRect(Field.WorldToLocal(r.Top), Field.WorldToLocal(r.Bottom)));
+end;
+
+procedure TTextRectengl.Save;
+begin
+  StrState := 'TTextRectangl' + '*';
+  inherited Save;
+  StrState += FTR + '*';
+end;
+
+procedure TTextRectengl.OpenF(s: string);
+begin
+  inherited OpenF(s);
+  FTR := arrStr[10];
+  arrStr.Free;
+end;
+
+procedure TTextRectengl.ExportSVG(node: TDOMElement; svg: TXMLDocument;
+  minp: TFloatPoint);
+begin
+
+end;
 
 { TFigure }
 
@@ -315,7 +406,7 @@ end;
 
 procedure TRemRectFigure.Save;
 begin
-  StrState += ColorToString(FPC) + ' ' + ColorToString(FBC) + ' ' +  IntToStr(FPW) + ' ' + GetEnumName(TypeInfo(TFPPenStyle), ord(FPS)) + ' ' + GetEnumName(TypeInfo(TFPBrushStyle), ord(FBS)) + ' ' + floattostr(round(r.Top.X)) + ' ' + floattostr(round(r.Top.y)) + ' ' + floattostr(round(r.Bottom.X)) + ' ' + floattostr(round(r.Bottom.y)) + ' ';
+  StrState += ColorToString(FPC) + '|' + ColorToString(FBC) + '|' +  IntToStr(FPW) + '|' + GetEnumName(TypeInfo(TFPPenStyle), ord(FPS)) + '|' + GetEnumName(TypeInfo(TFPBrushStyle), ord(FBS)) + '|' + floattostr(round(r.Top.X)) + '|' + floattostr(round(r.Top.y)) + '|' + floattostr(round(r.Bottom.X)) + '|' + floattostr(round(r.Bottom.y)) + '|';
 end;
 
 procedure TRemRectFigure.OpenF(s: string);
@@ -326,7 +417,7 @@ begin
   o := '';
   Del := False;
   arrStr := TStringList.Create;
-  arrStr.Delimiter := ' ';
+  arrStr.Delimiter := '|';
   arrStr.DelimitedText := s;
   FPC := StringToColor(arrStr[1]);
   FBC := StringToColor(arrStr[2]);
@@ -365,7 +456,7 @@ end;
 
 procedure TRectangle.Save;
 begin
-  StrState := 'TRectangle' + ' ';
+  StrState := 'TRectangle' + '|';
   inherited Save;
 end;
 
@@ -420,7 +511,7 @@ end;
 
 procedure TEllipse.save;
 begin
-  StrState := 'TEllipse' + ' ';
+  StrState := 'TEllipse' + '|';
   inherited Save;
 end;
 
@@ -477,9 +568,9 @@ begin
 
 procedure TRoundRectangle.Save;
 begin
-  StrState := 'TRoundRectangle' + ' ';
+  StrState := 'TRoundRectangle' + '|';
   inherited Save;
-  StrState += IntToStr(FRR) + ' ';
+  StrState += IntToStr(FRR) + '|';
 end;
 
 procedure TRoundRectangle.OpenF(s: string);
@@ -590,9 +681,9 @@ var
   s: string;
   i: integer;
 begin
-  StrState := 'TPolyLine' + ' ' + ColorToString(FPC) + ' ' +  IntToStr(FPW) + ' ' + GetEnumName(TypeInfo(TFPPenStyle), ord(FPS)) + ' ';
+  StrState := 'TPolyLine' + '|' + ColorToString(FPC) + '|' +  IntToStr(FPW) + '|' + GetEnumName(TypeInfo(TFPPenStyle), ord(FPS)) + '|';
   for i := 0 to High(p) do
-    StrState += FloatToStr(round(p[i].x)) + ' ' + FloatToStr(round(p[i].y)) + ' ';
+    StrState += FloatToStr(round(p[i].x)) + '|' + FloatToStr(round(p[i].y)) + '|';
 end;
 
 procedure TPolyLine.OpenF(s: string);
@@ -603,7 +694,7 @@ begin
   o := '';
   Del := False;
   arrStr := TStringList.Create;
-  arrStr.Delimiter := ' ';
+  arrStr.Delimiter := '|';
   arrStr.DelimitedText := s;
   FPC := StringToColor(arrStr[1]);
   FPW := StrToInt(arrStr[2]);

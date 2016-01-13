@@ -111,6 +111,16 @@ type
     procedure MouseUp(PB: TPoint); override;
   end;
 
+  { TToolText }
+
+  TToolText = class(TTool)
+  public
+    function CreateParamObj:TPersistent;  override;
+    procedure MouseDown(po: TPoint);  override;
+    procedure MouseMove(po: TPoint);  override;
+    procedure MouseUp(PB: TPoint); override;
+  end;
+
   ClassOfTTool = class of TTool;
   ArrOfTTool = array of TTool;
 
@@ -130,6 +140,38 @@ var
   PLineFlag: boolean;
   ShiftFlag: Boolean;
 implementation
+
+{ TToolText }
+
+function TToolText.CreateParamObj: TPersistent;
+begin
+  WFigure := TTextRectengl.Create;
+  Result:=inherited CreateParamObj;
+end;
+
+procedure TToolText.MouseDown(po: TPoint);
+var
+  p: TFloatPoint;
+begin
+  SetLength(figures, Length(figures) + 1);
+  figures[High(figures)] := WFigure;
+  p := Field.LocalToWorld(po);
+  WFigure.Next(p);
+end;
+
+procedure TToolText.MouseMove(po: TPoint);
+var
+  p: TFloatPoint;
+begin
+  p := Field.LocalToWorld(po);
+  WFigure.Finish(p);
+end;
+
+procedure TToolText.MouseUp(PB: TPoint);
+begin
+  inherited MouseUp(PB);
+  Scene.SelectEdit;
+end;
 
 { TToolMouse }
 
@@ -440,6 +482,7 @@ initialization
  ConstTool.ToolRegister(TToolEllipse);
  ConstTool.ToolRegister(TToolRectangle);
  ConstTool.ToolRegister(TToolRoundRectangle);
+ ConstTool.ToolRegister(TToolText);
  ConstTool.ToolRegister(TToolHand);
  ConstTool.ToolRegister(TToolLoupe);
  ConstTool.ToolRegister(TToolMouse);

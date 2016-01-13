@@ -6,7 +6,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
   Buttons, Menus, StdCtrls, Grids, typinfo, tool,
-  DrawScene, UTransform, UTypes, types, FPCanvas, EditCreate, LCLType;
+  DrawScene, UTransform, UTypes, types, FPCanvas, EditCreate, LCLType, ColorBox;
 type
 
   { TMyForm }
@@ -547,7 +547,7 @@ begin
   begin
     if not ((ssCtrl in Shift) or (ssShift in Shift)) then
       Scene.MouseMarkNul;
-    ShiftFlag := (ssShift in Shift) and (ToolKod = 8);
+    ShiftFlag := (ssShift in Shift) and (ToolKod = 9);
     DownMouseFlag := True;
     consttool.tool[ToolKod].MouseDown(Point(x, y));
   end
@@ -580,14 +580,14 @@ begin
     MyForm.Caption := onFileName + '*.yhd';
   Field.Zoom := StrToFloat(EditZoom.Text) / 100;
   Scene.PBDraw(PaintBox.Canvas);
-  if ((ToolKod = 7) or (ToolKod = 8)) and DownMouseFlag then
+  if ((ToolKod = 8) or (ToolKod = 9)) and DownMouseFlag then
   begin
     PaintBox.canvas.Pen.Style := psDot;
     PaintBox.canvas.Brush.Style := bsClear;
     PaintBox.canvas.Pen.Width := 3;
     PaintBox.canvas.Pen.Color := clGray;
-    if ToolKod = 7 then PaintBox.Canvas.Rectangle(Field.PRect);
-    if (ToolKod = 8) and (not ShiftFlag) then PaintBox.Canvas.Rectangle(ToRect(Field.WorldToLocal(MouseRect.Bottom), Field.WorldToLocal(MouseRect.Top)));
+    if ToolKod = 8 then PaintBox.Canvas.Rectangle(Field.PRect);
+    if (ToolKod = 9) and (not ShiftFlag) then PaintBox.Canvas.Rectangle(ToRect(Field.WorldToLocal(MouseRect.Bottom), Field.WorldToLocal(MouseRect.Top)));
   end;
   MyForm.Scroll;
 end;

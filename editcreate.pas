@@ -5,7 +5,7 @@ unit EditCreate;
 interface
 
 uses
-  Classes, SysUtils, typinfo, Graphics, ExtCtrls, StdCtrls, Controls, spin, LCLType, FPCanvas, UTypes;
+  Classes, SysUtils, typinfo, Graphics, ExtCtrls, StdCtrls, Controls, spin, LCLType, FPCanvas, UTypes, Dialogs;
 
 type
 
@@ -28,8 +28,31 @@ type
   TEditPenStyle = class(TFigureEdit)
   private
     cmbbox: TComboBox;
-    procedure cmbboxDrawItem(Control: TWinControl; Index: Integer;
-    ARect: TRect; State: TOwnerDrawState);
+    procedure cmbboxDrawItem(Control: TWinControl; Index: Integer; ARect: TRect; State: TOwnerDrawState);
+    procedure Change(Sender: TObject); override;
+  public
+    constructor Create(pObj: array of TPersistent; pProp: PPropInfo; panel: TPanel; defaultProp: boolean); override;
+    destructor Destroy; override;
+    procedure Refresh; override;
+  end;
+
+  { TEditStr }
+
+  TEditStr = class(TFigureEdit)
+  private
+    ed: TEdit;
+    procedure Change(Sender: TObject); override;
+  public
+    constructor Create(pObj: array of TPersistent; pProp: PPropInfo; panel: TPanel; defaultProp: boolean); override;
+    destructor Destroy; override;
+    procedure Refresh; override;
+  end;
+
+  { TEditeTextStyle }
+
+  TEditeTextStyle = class(TFigureEdit)
+  private
+    but: TButton;
     procedure Change(Sender: TObject); override;
   public
     constructor Create(pObj: array of TPersistent; pProp: PPropInfo; panel: TPanel; defaultProp: boolean); override;
@@ -57,8 +80,7 @@ type
   TEditBrushStyle = class(TFigureEdit)
   private
     cmbbox: TComboBox;
-    procedure cmbboxDrawItem(Control: TWinControl; Index: Integer;
-    ARect: TRect; State: TOwnerDrawState);
+    procedure cmbboxDrawItem(Control: TWinControl; Index: Integer; ARect: TRect; State: TOwnerDrawState);
     procedure Change(Sender: TObject); override;
   public
     constructor Create(pObj: array of TPersistent; pProp: PPropInfo; panel: TPanel; defaultProp: boolean); override;
@@ -112,6 +134,115 @@ var
   PBInd: procedure of Object;
 
 implementation
+
+{ TEditeTextStyle }
+
+
+procedure TEditeTextStyle.Change(Sender: TObject);
+var
+  FD: TFontDialog;
+  i: integer;
+begin
+  FD := TFontDialog.Create(nil);
+  if FD.Execute then
+  but.Caption := FD.Font.Name;
+  for i := 0 to high(obj) do
+    SetStrProp(obj[i], prop, but.Caption);
+  PropValues.Values[prop^.Name] := but.Caption;
+  inherited Change(Sender);
+  FD.destroy;
+end;
+
+constructor TEditeTextStyle.Create(pObj: array of TPersistent;
+  pProp: PPropInfo; panel: TPanel; defaultProp: boolean);
+var
+  i: integer;
+begin
+  but := TButton.Create(nil);
+  but.parent := panel;
+  but.Left := trunc(panel.width * 0.5) + 2;
+  but.width := trunc(panel.Width * 0.5) - 4;
+  but.Caption := 'Times New Roman';
+  but.OnClick := @Change;
+  but.Top := panel.tag;
+  inherited Create(pObj, pProp, panel, defaultProp);
+  if defaultProp and (PropValues.Values[prop^.Name] <> '') Then
+    for i := 0 to high(obj) do
+      SetStrProp(obj[i], prop, PropValues.Values[prop^.Name]);
+  Refresh;
+end;
+
+destructor TEditeTextStyle.Destroy;
+begin
+  but.destroy;
+  inherited Destroy;
+end;
+
+procedure TEditeTextStyle.Refresh;
+var
+  i: integer;
+  s: string;
+begin
+  s := GetStrProp(obj[0], prop);
+  for i := 0 to high(obj) do
+    if GetStrProp(obj[i], prop) <> s then
+    begin
+      s := GetStrProp(obj[0], prop);
+      break;
+    end;
+  but.Caption := s;
+end;
+
+{ TEditStr }
+
+procedure TEditStr.Change(Sender: TObject);
+var
+  i: integer;
+begin
+  for i := 0 to high(obj) do
+    SetStrProp(obj[i], prop, ed.text);
+  PropValues.Values[prop^.Name] := Ed.Text;
+  inherited Change(Sender);
+end;
+
+constructor TEditStr.Create(pObj: array of TPersistent; pProp: PPropInfo;
+  panel: TPanel; defaultProp: boolean);
+var
+  i: integer;
+begin
+  ed := TEdit.Create(nil);
+  ed.parent := panel;
+  ed.Left := trunc(panel.width * 0.5) + 2;
+  ed.width := trunc(panel.Width * 0.5) - 4;
+  ed.OnChange := @Change;
+  ed.Top := panel.tag;
+  inherited Create(pObj, pProp, panel, defaultProp);
+  if defaultProp and (PropValues.Values[prop^.Name] <> '') Then
+    for i := 0 to high(obj) do
+      SetStrProp(obj[i], prop, PropValues.Values[prop^.Name]);
+  Refresh;
+end;
+
+destructor TEditStr.Destroy;
+begin
+  ed.destroy;
+  inherited Destroy;
+end;
+
+procedure TEditStr.Refresh;
+var
+  i: integer;
+  s: string;
+begin
+  s := GetStrProp(obj[0], prop);
+  for i := 0 to high(obj) do
+    if GetStrProp(obj[i], prop) <> s then
+    begin
+      s := GetStrProp(obj[0], prop);
+      break;
+    end;
+  ed.text := s;
+end;
 
 { TEditRun }
 
@@ -191,7 +322,7 @@ begin
     if b then
     begin
       for j := 0 to high(EditorContainer.editor) do
-        if list^[i]^.PropType^.Name = EditorContainer.editor[j].sstr then
+        if list^[i]^.Name = EditorContainer.editor[j].sstr then
         begin
           SetLength(editors, length(editors) + 1);
           editors[high(editors)] := EditorContainer.editor[j].item.Create(obj, list^[i], panel, defaultProp);
@@ -492,21 +623,24 @@ end;
 initialization
 
 EditorContainer := TFEditorContainer.create;
-
-EditorContainer.addTool(TEditInt, 'LongInt');
-EditorContainer.addTool(TEditPenStyle, 'TFPPenStyle');
-EditorContainer.addTool(TEditBrushStyle, 'TFPBrushStyle');
+EditorContainer.addTool(TEditStr, 'FTextRect');
+EditorContainer.addTool(TEditeTextStyle,'FTextName');
+EditorContainer.addTool(TEditInt, 'WidthFigure');
+EditorContainer.addTool(TEditPenStyle, 'FPenStyle');
+EditorContainer.addTool(TEditBrushStyle, 'FBrushStyle');
+EditorContainer.addTool(TEditInt, 'FRoundRect');
 
 PropValues := TStringList.Create;
-
+PropValues.Values['FTextRect'] := ' ';
 PropValues.Values['WidthFigure'] := '3';
 PropValues.Values['FPenStyle'] := '0';
 PropValues.Values['FBrushStyle'] := '0';
 PropValues.Values['FRoundRect'] := '15';
 
 PropNames := TStringList.Create;
-
-PropNames.Values['WidthFigure'] :='Толщина пера';
+PropNames.Values['FTextRect'] := 'Текст';
+PropNames.Values['FTextName'] := 'Стиль';
+PropNames.Values['WidthFigure'] := 'Толщина пера';
 PropNames.Values['FPenStyle'] :='Стиль линии';
 PropNames.Values['FBrushStyle'] := 'Вид заливки';
 PropNames.Values['FRoundRect'] := 'Радиус скругления';

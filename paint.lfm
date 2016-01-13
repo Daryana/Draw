@@ -4,8 +4,8 @@ object MyForm: TMyForm
   Top = 198
   Width = 869
   Caption = 'Редактор'
-  ClientHeight = 0
-  ClientWidth = 0
+  ClientHeight = 518
+  ClientWidth = 869
   Color = clWindow
   Menu = MainMenu
   OnCloseQuery = FormCloseQuery
@@ -16,14 +16,14 @@ object MyForm: TMyForm
     Left = 0
     Height = 37
     Top = 0
-    Width = 0
+    Width = 869
     Align = alTop
     Caption = ' '
     ClientHeight = 37
-    ClientWidth = 0
+    ClientWidth = 869
     TabOrder = 0
     object TToolClear: TBitBtn
-      Left = 0
+      Left = 71
       Height = 35
       Top = 1
       Width = 35
@@ -164,7 +164,7 @@ object MyForm: TMyForm
       TabOrder = 0
     end
     object LoupeMinus: TBitBtn
-      Left = 0
+      Left = 36
       Height = 35
       Top = 1
       Width = 35
@@ -305,7 +305,7 @@ object MyForm: TMyForm
       TabOrder = 1
     end
     object LoupePlus: TBitBtn
-      Left = 0
+      Left = 1
       Height = 35
       Top = 1
       Width = 35
@@ -448,18 +448,18 @@ object MyForm: TMyForm
   end
   object PanelEdit: TPanel
     Left = 0
-    Height = 0
-    Top = 0
+    Height = 481
+    Top = 37
     Width = 320
     Align = alLeft
     Caption = ' '
-    ClientHeight = 0
+    ClientHeight = 481
     ClientWidth = 320
     TabOrder = 1
     object PanelZoom: TPanel
       Left = 1
       Height = 40
-      Top = -40
+      Top = 440
       Width = 318
       Align = alBottom
       Caption = ' '
@@ -526,19 +526,19 @@ object MyForm: TMyForm
     end
   end
   object PanelPaint: TPanel
-    Left = 0
-    Height = 0
-    Top = 0
-    Width = 0
+    Left = 320
+    Height = 481
+    Top = 37
+    Width = 549
     Align = alClient
-    ClientHeight = 0
-    ClientWidth = 0
+    ClientHeight = 481
+    ClientWidth = 549
     TabOrder = 2
     object PaintBox: TPaintBox
-      Left = 0
-      Height = 0
-      Top = 0
-      Width = 0
+      Left = 1
+      Height = 462
+      Top = 1
+      Width = 530
       Align = alClient
       OnMouseDown = PaintBoxMouseDown
       OnMouseMove = PaintBoxMouseMove
@@ -547,10 +547,10 @@ object MyForm: TMyForm
       OnPaint = PaintBoxPaint
     end
     object HScrollBar: TScrollBar
-      Left = 0
+      Left = 1
       Height = 17
-      Top = -17
-      Width = 0
+      Top = 463
+      Width = 547
       Align = alBottom
       Max = 999
       PageSize = 0
@@ -559,9 +559,9 @@ object MyForm: TMyForm
       OnScroll = HScrollBarScroll
     end
     object VScrollBar: TScrollBar
-      Left = -17
-      Height = 0
-      Top = 0
+      Left = 531
+      Height = 462
+      Top = 1
       Width = 17
       Align = alRight
       Kind = sbVertical
